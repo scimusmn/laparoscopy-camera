@@ -58,23 +58,30 @@ make
 
 #### Step Six
 
-You now need to configure the software so that it runs on startup. To do this, open the `.profile` file by running 
+You now need to configure the software so that it runs on startup. The first step is to disable the screensaver. To do this, run `startx xscreensaver` and pick from the drop-down menu "Disable screen saver." Go to "File > Quit" to exit the program.
+
+Next, run
 
 ```bash
 cd
 nano .profile
 ```
 
-This will put you into a text editor. Add to the bottom of the file the line
+to open the `.profile` file in the nano text editor. Add to the bottom of the file the line
 
 ```
-startx /home/pi/laparoscopy-camera/laparoscopy --no-cursor
+startx /home/pi/laparoscopy-camera/init.sh
 ```
 
-**Important note:*** If you installed the `laparoscopy` executable somewhere other than the path above, you should supply that path instead.
+> **Important note:** If you installed the repository somewhere 
+> other than the path above, you should supply that path instead. Additionally, 
+> you should edit `init.sh` to reflect that alternative path as well.
 
-It is also helpful to disable screen blanking. To do this, run `startx xscreensaver` and pick from the drop-down menu "Disable screen saver." Go to "File > Quit" to exit the program.
+Press `Ctrl-O` to save the file and `Ctrl-X` to quit.
 
-Finally, run `sudo raspi-config` and select "Boot Options" > "Desktop/CLI." Use the arrow keys to select "Console Autologin" and press enter. Select "yes" to reboot, and ensure that the program is working properly.
+Finally, run `sudo raspi-config` and select 
+"Boot Options" > "Desktop/CLI." Use the arrow keys to select 
+"Console Autologin" and press enter. Select "yes" to reboot,
+and ensure that the program is working properly.
 
-**YOU'RE DONE!**
+**Done!**
