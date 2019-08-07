@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 2.8)
+project( laparoscopy C CXX )
+find_package( OpenCV REQUIRED )
+find_package( X11 REQUIRED )
+set(CMAKE_BUILD_TYPE Release)
+include_directories( ${OpenCV_INCLUDE_DIRS} )
+add_executable( laparoscopy laparoscopy.cpp )
+target_link_libraries( laparoscopy wiringPi ${OpenCV_LIBS} ${X11_LIBRARIES} )
