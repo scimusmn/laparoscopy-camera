@@ -73,6 +73,8 @@ startx /home/pi/laparoscopy-camera/laparoscopy --no-cursor
 
 **Important note:*** If you installed the `laparoscopy` executable somewhere other than the path above, you should supply that path instead.
 
+It is also helpful to disable screen blanking. To do this, run `startx xscreensaver` and pick from the drop-down menu "Disable screen saver." Go to "File > Quit" to exit the program.
+
 Finally, run `sudo raspi-config` and select "Boot Options" > "Desktop/CLI." Use the arrow keys to select "Console Autologin" and press enter. Select "yes" to reboot, and ensure that the program is working properly.
 
 **YOU'RE DONE!**

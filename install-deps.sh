@@ -18,4 +18,4 @@ sudo apt-get install -y build-essential cmake pkg-config libjpeg-dev libtiff5-de
                         libatlas-base-dev libblas-dev libeigen3-dev liblapack-dev \
                         gfortran python2.7-dev python3-dev
 
-sudo apt-get install -y wiringpi xinit
+sudo apt-get install -y wiringpi xinit xscreensaver
