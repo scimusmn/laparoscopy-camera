@@ -57,7 +57,7 @@ make
 
 #### Step Six
 
-You now need to configure the software so that it runs on startup. The first step is to disable the screensaver. To do this, run `startx xscreensaver` and pick from the drop-down menu "Disable screen saver." Go to "File > Quit" to exit the program.
+You now need to configure the software so that it runs on startup. The first step is to disable the screensaver. To do this, run `startx xscreensaver-demo` and pick from the drop-down menu "Disable screen saver." Go to "File > Quit" to exit the program.
 
 Next, run
 
