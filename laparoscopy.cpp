@@ -58,7 +58,7 @@ int main( int argc, char** argv ) {
   Mat frame, oldframe, display;
   camera >> oldframe;
 
-  display = make_waitscreen();
+  display = make_waitscreen(screen_w, screen_h, wait_text);
   
   bool showcamera = false;
 
@@ -69,7 +69,13 @@ int main( int argc, char** argv ) {
   while (true) {
     if (showcamera) {
       camera >> frame; // get frame from the camera
-
+      // resize frame for display.
+      // we need to do the resizing manually, because we need to force
+      // nearest-neighbor interpolation, as the default linear interpolation
+      // is too intensive for the Pi to keep up with and produces noticeable
+      // lag.
+      resize( frame, display, Size(screen_w, screen_h), 0, 0, INTER_NEAREST );
+      
       // has the difference time been exceded?
       if (steady_clock::now() >= timepoint + diff_check_interval ) {
 	// time since last timepoint is greater than diff_check_interval
@@ -88,12 +94,6 @@ int main( int argc, char** argv ) {
 	  timepoint = steady_clock::now();
 	}
       }
-      // resize frame for display.
-      // we need to do the resizing manually, because we need to force
-      // nearest-neighbor interpolation, as the default linear interpolation
-      // is too intensive for the Pi to keep up with and produces noticeable
-      // lag.
-      resize( frame, display, Size(screen_w, screen_h), 0, 0, INTER_NEAREST );
     }
     else {
       // showcamera is false
