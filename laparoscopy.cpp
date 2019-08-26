@@ -10,23 +10,30 @@ using namespace std::chrono;
 using namespace std;
 using namespace cv;
 
-milliseconds diff_check_interval(10000); // check for difference every 10 seconds
-
-milliseconds text_move_interval(10000); // move on-screen text every 10 seconds
-
-string window_name = "Laparascopy";
-string difference_fname = "diffcheck.png";
-string wait_text = "Push button to start.";
-
-double difference_threshold = 0.03; // images less than 3% different are deemed the same
-
 // function to check the level of difference between two images
 double get_difference( Mat, Mat );
 
+// function to build the wait_text mat
+Mat make_wait_text( string, string, int, int, int );
+
 // function to build a frame of the screensaver
-Mat make_waitscreen( int, int, string );
+Mat make_waitscreen( int, int, Mat, int, int, int );
 
 int main( int argc, char** argv ) {
+  // important constants
+  milliseconds diff_check_interval(10000); // check for difference every 10 seconds
+  milliseconds text_move_interval(10000); // move on-screen text every 10 seconds
+  
+  string window_name = "Laparascopy";
+  string text_fname = "img/wait_text.png";
+  string alpha_fname = "img/alpha_mask.png";
+
+  int bg_red = 51;
+  int bg_grn = 51;
+  int bg_blu = 51;
+  
+  double difference_threshold = 0.03; // images less than 3% different are deemed the same
+  
   // set up wiring pi
   wiringPiSetup();
   int button_pin = 9;
@@ -58,7 +65,8 @@ int main( int argc, char** argv ) {
   Mat frame, oldframe, display;
   camera >> oldframe;
 
-  display = make_waitscreen(screen_w, screen_h, wait_text);
+  Mat wait_text = make_wait_text( text_fname, alpha_fname, bg_red, bg_grn, bg_blu);
+  display = make_waitscreen(screen_w, screen_h, wait_text, bg_red, bg_grn, bg_blu);
   
   bool showcamera = false;
 
@@ -89,7 +97,7 @@ int main( int argc, char** argv ) {
 	  // turn off the camera
 	  showcamera = false;
 	  camera >> frame;
-	  display = make_waitscreen( screen_w, screen_h, wait_text );
+	  display = make_waitscreen( screen_w, screen_h, wait_text, bg_red, bg_grn, bg_blu );
 	  digitalWrite(led_pin,1); // turn on led
 	  timepoint = steady_clock::now();
 	}
@@ -111,7 +119,7 @@ int main( int argc, char** argv ) {
 
       // check if the time has exceeded text_move_interval
       if (steady_clock::now() >= timepoint + text_move_interval ) {
-	display = make_waitscreen( screen_w, screen_h, wait_text );
+	display = make_waitscreen( screen_w, screen_h, wait_text, bg_red, bg_grn, bg_blu );
 	timepoint = steady_clock::now();
       }
     }
@@ -155,17 +163,50 @@ double get_difference( Mat src1, Mat src2 ) {
 }
 
 
-Mat make_waitscreen( int screen_w, int screen_h, string text ) {
-  int baseline = 0;
-  Size textsize = getTextSize( text, FONT_HERSHEY_DUPLEX, 1, 1, &baseline );
+// ~~~~~~~~
 
-  int x = rand() % ( screen_w - textsize.width );
-  int y = rand() % ( screen_h - textsize.height );
+
+Mat make_wait_text ( string fwait_text, string falpha_mask, int bg_red, int bg_grn, int bg_blu ) {
+  // load images
+  Mat fg = imread(fwait_text, IMREAD_COLOR);
+  Mat bg ( fg.rows, fg.cols, CV_8UC3, Scalar(bg_blu, bg_grn, bg_red) );
+  Mat alpha = imread(falpha_mask, IMREAD_COLOR);
+
+  // convert to floats
+  fg.convertTo(fg, CV_32FC3);
+  bg.convertTo(bg, CV_32FC3);
+  alpha.convertTo(alpha, CV_32FC3, 1.0/255);
+
+  // output mat
+  Mat wait_text = Mat::zeros(fg.size(), fg.type());
+
+  // apply alpha mask
+  multiply(alpha, fg, fg);
+  multiply(Scalar::all(1.0)-alpha, bg, bg);
+
+  // combine images
+  add(fg, bg, wait_text);
+
+  // convert back to normal format
+  wait_text.convertTo(wait_text, CV_8UC3);
+
+  return wait_text;
+}
+
+
+// ~~~~~~~~
+
+
+Mat make_waitscreen( int screen_w, int screen_h, Mat wait_text,  int bg_red, int bg_grn, int bg_blu ) {
+
+  int x = rand() % ( screen_w - wait_text.cols );
+  int y = rand() % ( screen_h - wait_text.rows );
+
+  Rect roi ( x, y, wait_text.cols, wait_text.rows );
   
-  Mat waitscreen ( screen_h, screen_w, CV_8UC3, Scalar(64,64,64) );
-  putText( waitscreen, text,
-	   Point(x,y), FONT_HERSHEY_SIMPLEX, 1,
-	   Scalar(255,255,255), 1, LINE_AA );
+  Mat waitscreen ( screen_h, screen_w, CV_8UC3, Scalar(bg_blu,bg_grn,bg_red) );
+  wait_text.copyTo( waitscreen( roi ) );
 
   return waitscreen;
 }
+
