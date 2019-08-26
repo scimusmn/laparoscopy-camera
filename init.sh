@@ -1,4 +1,5 @@
 #!/bin/bash
 
 xscreensaver &
-laparoscopy-camera/laparoscopy
+cd laparoscopy-camera
+./laparoscopy
