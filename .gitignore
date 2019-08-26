@@ -3,3 +3,5 @@ laparoscopy
 Makefile
 CMakeFiles
 cmake_install.cmake
+.gitignore~
+

@@ -6,6 +6,8 @@
 #include <chrono>
 #include <cstdlib>
 
+#include <sstream>
+
 using namespace std::chrono;
 using namespace std;
 using namespace cv;
@@ -32,7 +34,7 @@ int main( int argc, char** argv ) {
   int bg_grn = 51;
   int bg_blu = 51;
   
-  double difference_threshold = 0.03; // images less than 3% different are deemed the same
+  double difference_threshold = 0.05; // images less than 3% different are deemed the same
   
   // set up wiring pi
   wiringPiSetup();
@@ -67,6 +69,8 @@ int main( int argc, char** argv ) {
 
   Mat wait_text = make_wait_text( text_fname, alpha_fname, bg_red, bg_grn, bg_blu);
   display = make_waitscreen(screen_w, screen_h, wait_text, bg_red, bg_grn, bg_blu);
+
+  double diff = 0;
   
   bool showcamera = false;
 
@@ -83,7 +87,6 @@ int main( int argc, char** argv ) {
       // is too intensive for the Pi to keep up with and produces noticeable
       // lag.
       resize( frame, display, Size(screen_w, screen_h), 0, 0, INTER_NEAREST );
-      
       // has the difference time been exceded?
       if (steady_clock::now() >= timepoint + diff_check_interval ) {
 	// time since last timepoint is greater than diff_check_interval
